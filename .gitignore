@@ -1,0 +1,14 @@
+.idea/
+.vscode/
+node_modules/
+build/
+dist/
+tmp/
+temp/
+database.sqlite
+.env
+server/migrations/3*
+coverage/
+docker_app/
+Dockerfile
+.dockerignore
