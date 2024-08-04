@@ -30,3 +30,5 @@ export default (app) => ({
     return date.toLocaleString();
   },
 });
+
+export const isAuthoriedUser = (sessionUser, requiredUserId) => (sessionUser.id === requiredUserId);

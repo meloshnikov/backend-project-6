@@ -16,7 +16,22 @@ export default {
       users: {
         create: {
           error: 'Failed to register',
-          success: 'User registered successfully',
+          success: 'User successfully registered',
+        },
+        edit: {
+          error: {
+            wrong_auth: 'You cannot edit or delete another user',
+            no_auth: 'Access denied! Please log in.',
+            edit: 'Failed to edit user',
+          },
+          success: 'User successfully edited',
+        },
+        delete: {
+          error: {
+            auth: 'You cannot edit or delete another user',
+            default: 'Failed to delete user',
+          },
+          success: 'User successfully deleted',
         },
       },
       authError: 'Access denied! Please login',
@@ -38,12 +53,20 @@ export default {
       },
       users: {
         id: 'ID',
+        title: 'Users',
         email: 'Email',
         createdAt: 'Created at',
         new: {
           submit: 'Register',
           signUp: 'Register',
         },
+        edit: 'Edit User',
+        actions: {
+          title: 'Actions',
+          edit: 'Edit',
+          save: 'Save',
+          delete: 'Delete'
+        }
       },
       welcome: {
         index: {
