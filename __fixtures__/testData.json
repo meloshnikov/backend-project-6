@@ -18,5 +18,13 @@
       "email": "ivanov@live.com",
       "password": "RLJvaIgPOnX5r03"    
     }
+  },
+  "statuses": {
+    "new": {
+      "name": "новый"
+    },
+    "edit": {
+      "name": "в работе"
+    }
   }
 }

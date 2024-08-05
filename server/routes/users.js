@@ -80,7 +80,7 @@ export default (app) => {
 
       return reply;
     })
-    .delete('/users/:id', async (req, reply) => { // eslint-disable-line consistent-return
+    .delete('/users/:id', async (req, reply) => {
       try {
         const userId = req.params.id;
         const user = await User.query().findById(userId);

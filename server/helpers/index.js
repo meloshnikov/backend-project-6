@@ -13,8 +13,6 @@ export default (app) => ({
   _,
   getAlertClass(type) {
     switch (type) {
-      // case 'failure':
-      //   return 'danger';
       case 'error':
         return 'danger';
       case 'success':
@@ -32,3 +30,12 @@ export default (app) => ({
 });
 
 export const isAuthoriedUser = (sessionUser, requiredUserId) => (sessionUser.id === requiredUserId);
+
+export const redirectToRootIfNotAuthenticated = (app) => (req, reply, next) => {
+  if (!req.isAuthenticated()) {
+    req.flash('error', i18next.t('flash.users.edit.error.noAuth'));
+    return reply.redirect(app.reverse('root'));
+  }
+
+  next();
+};

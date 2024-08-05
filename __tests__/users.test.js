@@ -5,7 +5,7 @@ import fastify from 'fastify';
 
 import init from '../server/plugin.js';
 import encrypt from '../server/lib/secure.cjs';
-import { getTestData, prepareData } from './helpers/index.js';
+import { getTestData, getUserCookie, prepareData } from './helpers/index.js';
 
 describe('test users CRUD', () => {
   let app;
@@ -22,10 +22,6 @@ describe('test users CRUD', () => {
     knex = app.objection.knex;
     models = app.objection.models;
 
-    // TODO: пока один раз перед тестами
-    // тесты не должны зависеть друг от друга
-    // перед каждым тестом выполняем миграции
-    // и заполняем БД тестовыми данными
     await knex.migrate.latest();
     await prepareData(app);
   });
@@ -69,18 +65,7 @@ describe('test users CRUD', () => {
 
   it('update', async () => {
     const params = testData.users.edit;
-
-    const responseSignIn = await app.inject({
-      method: 'POST',
-      url: app.reverse('session'),
-      payload: {
-        data: testData.users.new,
-      },
-    });
-
-    const [sessionCookie] = responseSignIn.cookies;
-    const { name, value } = sessionCookie;
-    const cookie = { [name]: value };
+    const cookies = await getUserCookie(app, testData.users.new);
 
     const user = await models.user.query().findOne({ email: testData.users.new.email });
 
@@ -90,7 +75,7 @@ describe('test users CRUD', () => {
       payload: {
         data: testData.users.edit,
       },
-      cookies: cookie,
+      cookies,
     });
 
     const edittedUser = await models.user.query().findById(user.id)
@@ -103,7 +88,7 @@ describe('test users CRUD', () => {
     await app.inject({
       method: 'DELETE',
       url: app.reverse('session'),
-      cookies: cookie,
+      cookies,
     });
   });
 
@@ -133,12 +118,6 @@ describe('test users CRUD', () => {
     expect(response.statusCode).toBe(302);
 
     expect(deletedUser).toBeFalsy();
-  });
-
-  afterEach(async () => {
-    // Пока Segmentation fault: 11
-    // после каждого теста откатываем миграции
-    // await knex.migrate.rollback();
   });
 
   afterAll(async () => {
