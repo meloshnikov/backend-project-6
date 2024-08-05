@@ -1,7 +1,5 @@
-// @ts-check
-
-import i18next from 'i18next';
-import _ from 'lodash';
+import i18next from "i18next";
+import _ from "lodash";
 
 export default (app) => ({
   route(name) {
@@ -13,12 +11,12 @@ export default (app) => ({
   _,
   getAlertClass(type) {
     switch (type) {
-      case 'error':
-        return 'danger';
-      case 'success':
-        return 'success';
-      case 'info':
-        return 'info';
+      case "error":
+        return "danger";
+      case "success":
+        return "success";
+      case "info":
+        return "info";
       default:
         throw new Error(`Unknown flash type: '${type}'`);
     }
@@ -29,13 +27,13 @@ export default (app) => ({
   },
 });
 
-export const isAuthoriedUser = (sessionUser, requiredUserId) => (sessionUser.id === requiredUserId);
+export const isAuthoriedUser = (sessionUser, requiredUserId) => sessionUser.id === requiredUserId;
 
 export const redirectToRootIfNotAuthenticated = (app) => (req, reply, next) => {
   if (!req.isAuthenticated()) {
-    req.flash('error', i18next.t('flash.users.edit.error.noAuth'));
-    return reply.redirect(app.reverse('root'));
+    req.flash("error", i18next.t("flash.users.edit.error.noAuth"));
+    return reply.redirect(app.reverse("root"));
   }
 
-  next();
+  return next();
 };
