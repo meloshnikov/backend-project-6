@@ -113,7 +113,7 @@ export const options = {
   exposeHeadRoutes: false,
 };
 
-export default async (app) => {
+export default async (app, _options) => {
   await registerPlugins(app);
 
   await setupLocalization();

@@ -28,6 +28,8 @@ rules:
         - req
         - reply
   no-underscore-dangle: [2, { "allow": ["__filename", "__dirname"] }]
+  # игнорируем неиспользуемые переменные с префиксом _
+  no-unused-vars: ["error", { "argsIgnorePattern": "^_" }]
 
 ignorePatterns:
   - dist/*

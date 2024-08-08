@@ -1,5 +1,3 @@
-// @ts-check
-
 export default {
   translation: {
     appName: "Fastify Boilerplate",
@@ -48,6 +46,20 @@ export default {
           },
         },
       },
+      tasks: {
+        create: {
+          error: "Failed to create task",
+          success: "Task successfully created",
+        },
+        edit: {
+          error: "Failed to edit task",
+          success: "Task successfully edited",
+        },
+        delete: {
+          error: "Only the author can delete the task",
+          success: "Task successfully deleted",
+        },
+      },
       authError: "Access denied! Please login",
     },
     layouts: {
@@ -57,6 +69,7 @@ export default {
         signUp: "Register",
         signOut: "Logout",
         statuses: "Statuses",
+        tasks: "Tasks",
       },
     },
     views: {
@@ -69,6 +82,9 @@ export default {
       users: {
         id: "ID",
         title: "Users",
+        first_name: "First Name",
+        last_name: "Last Name",
+        password: "Password",
         email: "Email",
         createdAt: "Created at",
         new: {
@@ -87,10 +103,10 @@ export default {
         id: "ID",
         name: "Name",
         createdAt: "Creation Date",
-        actions: "Actions",
         title: "Statuses",
-        createStatusButton: "Create Status",
-        act: {
+        create_status_button: "Create Status",
+        actions: {
+          title: "Actions",
           delete: "Delete",
           edit: "Edit",
         },
@@ -103,6 +119,39 @@ export default {
           title: "Create Status",
           submit: "Create",
           create: "Create",
+        },
+      },
+      tasks: {
+        id: "ID",
+        name: "Name",
+        description: "Description",
+        createdAt: "Creation Date",
+        title: "Tasks",
+        create_task_button: "Create Task",
+        my_tasks: "Just my tasks",
+        status: "Status",
+        show: "Show",
+        creator: "Author",
+        executor: "Executor",
+        actions: {
+          title: "Actions",
+          delete: "Delete",
+          edit: "Edit",
+        },
+        edit: {
+          title: "Edit Task",
+          submit: "Save",
+          error: "Failed to edit task",
+        },
+        new: {
+          title: "Create Task",
+          submit: "Create",
+          create: "Create",
+        },
+        view: {
+          creator: "Author",
+          executor: "Executor",
+          createdAt: "Creation Date",
         },
       },
       welcome: {

@@ -1,5 +1,4 @@
-// @ts-check
-
+ 
 import i18next from "i18next";
 import { isAuthoriedUser } from "../helpers/index.js";
 
@@ -48,8 +47,9 @@ export default (app) => {
         reply.redirect(app.reverse("root"));
         await req.logIn(validUser);
       } catch ({ data }) {
+        const errors = Object.entries(data).reduce((acc, [key, value]) => ({ ...acc, [key]: value[0] }), {});
         req.flash("error", i18next.t("flash.users.create.error"));
-        reply.render("users/new", { user, errors: data });
+        reply.render("users/new", { user, errors });
       }
 
       return reply;

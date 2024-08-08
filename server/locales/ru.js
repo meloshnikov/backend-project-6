@@ -1,5 +1,3 @@
-// @ts-check
-
 export default {
   translation: {
     appName: "Fastify Шаблон",
@@ -48,6 +46,20 @@ export default {
           success: "Статус успешно удалён",
         },
       },
+      tasks: {
+        create: {
+          error: "Не удалось создать задачу",
+          success: "Задача успешно создана",
+        },
+        edit: {
+          error: "Не удалось изменить задачу",
+          success: "Задача успешно изменена",
+        },
+        delete: {
+          error: "Задачу может удалить только её автор",
+          success: "Задача успешно удалёна",
+        },
+      },
       authError: "Доступ запрещён! Пожалуйста, авторизируйтесь.",
     },
     layouts: {
@@ -57,6 +69,7 @@ export default {
         signUp: "Регистрация",
         signOut: "Выход",
         statuses: "Статусы",
+        tasks: "Задачи",
       },
     },
     views: {
@@ -69,6 +82,9 @@ export default {
       users: {
         id: "ID",
         title: "Пользователи",
+        first_name: "Имя",
+        last_name: "Фамилия",
+        password: "Пароль",
         fullName: "Полное имя",
         email: "Email",
         createdAt: "Дата создания",
@@ -88,22 +104,55 @@ export default {
         id: "ID",
         name: "Полное имя",
         createdAt: "Дата создания",
-        actions: "Действия",
         title: "Статусы",
-        createStatusButton: "Создать статус",
-        act: {
+        create_status_button: "Создать статус",
+        actions: {
+          title: "Действия",
           delete: "Удалить",
           edit: "Изменить",
         },
         edit: {
           title: "Изменение статуса",
-          submit: "Изменить",
+          submit: "Сохранить",
           error: "Не удалось изменить статус",
         },
         new: {
           title: "Создание статуса",
           submit: "Создать",
           create: "Создать",
+        },
+      },
+      tasks: {
+        id: "ID",
+        name: "Наименование",
+        description: "Описание",
+        createdAt: "Дата создания",
+        title: "Задачи",
+        create_task_button: "Создать задачу",
+        my_tasks: "Только мои задачи",
+        status: "Статус",
+        show: "Показать",
+        creator: "Автор",
+        executor: "Исполнитель",
+        actions: {
+          title: "Действия",
+          delete: "Удалить",
+          edit: "Изменить",
+        },
+        edit: {
+          title: "Изменение задачи",
+          submit: "Изменить",
+          error: "Не удалось изменить задачу",
+        },
+        new: {
+          title: "Создание задачи",
+          submit: "Создать",
+          create: "Создать",
+        },
+        view: {
+          creator: "Автор",
+          executor: "Исполнитель",
+          createdAt: "Дата создания",
         },
       },
       welcome: {
