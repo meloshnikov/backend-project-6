@@ -60,6 +60,21 @@ export default {
           success: "Задача успешно удалёна",
         },
       },
+      labels: {
+        create: {
+          success: "Метка успешно создана",
+          error: "Не удалось создать метку",
+        },
+        update: {
+          success: "Метка успешно изменена",
+          error: "Не удалось обновить метку",
+          labelConnectedToTask: "Вы не можете удалить эту метку. Метка связана с одной или несколькими задачами",
+        },
+        delete: {
+          success: "Метка успешно удалена",
+          error: "Не удалось удалить метку",
+        },
+      },
       authError: "Доступ запрещён! Пожалуйста, авторизируйтесь.",
     },
     layouts: {
@@ -70,6 +85,7 @@ export default {
         signOut: "Выход",
         statuses: "Статусы",
         tasks: "Задачи",
+        labels: "Метки",
       },
     },
     views: {
@@ -134,6 +150,9 @@ export default {
         show: "Показать",
         creator: "Автор",
         executor: "Исполнитель",
+        is_creator_user: "Только мои задачи",
+        labels: "Метки",
+        label: "Метка",
         actions: {
           title: "Действия",
           delete: "Удалить",
@@ -153,6 +172,28 @@ export default {
           creator: "Автор",
           executor: "Исполнитель",
           createdAt: "Дата создания",
+        },
+      },
+      labels: {
+        id: "ID",
+        name: "Полное имя",
+        createdAt: "Дата создания",
+        title: "Метки",
+        create_label_button: "Создать метку",
+        actions: {
+          title: "Действия",
+          delete: "Удалить",
+          edit: "Изменить",
+        },
+        edit: {
+          title: "Изменение статуса",
+          submit: "Изменить",
+          error: "Не удалось изменить статус",
+        },
+        new: {
+          title: "Создание метки",
+          submit: "Создать",
+          create: "Создать",
         },
       },
       welcome: {

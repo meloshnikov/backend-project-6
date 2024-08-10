@@ -1,26 +1,24 @@
 extends ../layouts/application.pug
 
 block content
-  .container.wrapper.flex-grow-1
-    h1.display-4.fw-bold.mt-4= t('views.statuses.title')
-    a.btn.btn-primary(href='/statuses/new')= t('views.statuses.create_status_button')
-    .table-responsive
-      table.table.table-borderless.table-striped.mt-5.bg-white
-        thead
-          tr
-            th= t('views.statuses.id')
-            th= t('views.statuses.name')
-            th= t('views.statuses.createdAt')
-            th
-          tbody
-            each status in statuses
-              tr
-                td= status.id
-                td= status.name
-                td= formatDate(status.createdAt)
-                td
-                  .d-flex.flex-wrap
-                    a.btn.btn-primary.me-1(href=`/statuses/${status.id}/edit`)= t('views.statuses.actions.edit')
-                    form(action=`/statuses/${status.id}`, method="post")
-                      input(name="_method", type="hidden", value="delete")
-                      input.btn.btn-danger(type="submit" value=t('views.statuses.actions.delete'))
+  div.container.wrapper.flex-grow-1
+  h1.display-4.fw-bold.mt-4= t('views.statuses.title')
+  a.btn.btn-primary(href=route('newLabel'))= t('views.statuses.new.title')
+  table.table.table-striped
+    thead
+      tr
+        th= t('views.statuses.id')
+        th= t('views.statuses.name')
+        th= t('views.statuses.createdAt')
+        th= t('views.statuses.actions.title')
+    tbody
+      each label in statuses
+        tr
+          td= label.id
+          td= label.name
+          td= formatDate(label.createdAt)
+          td
+            +formFor()(action=`/statuses/${label.id}` method='post')
+              a.btn.btn-primary.me-1(href=`/statuses/${label.id}/edit`)=t('views.statuses.actions.edit')
+              input(name="_method" type="hidden" value="delete")
+              input.btn.btn-danger(type="submit" value=t('views.statuses.actions.delete'))

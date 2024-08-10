@@ -62,14 +62,18 @@ export const getSelectedItems = (items, ids) =>
     selected: ids.includes(item.id),
   }));
 
-export const getDataByModels = async (Status, User) => {
-  const [statuses, users, labels] = await Promise.all([Status.query(), User.query()]);
+export const getDataByModels = async (Status, User, Label) => {
+  const [statuses, users, labels] = await Promise.all([Status.query(), User.query(), Label.query()]);
   return { statuses, users, labels };
 };
 
-export const processData = async (task, statuses, users) => {
+export const processData = async (task, statuses, users, labels) => {
+  const relatedLabels = await task.$relatedQuery("labels");
+  const relatedLabelsIds = relatedLabels.map((label) => label.id);
+
   const statusesWithSelected = getSelectedItems(statuses, [task.statusId]);
   const usersWithSelected = getSelectedItems(users, [task.executorId]);
+  const labelsWithSelected = getSelectedItems(labels, relatedLabelsIds);
 
-  return { statuses: statusesWithSelected, users: usersWithSelected };
+  return { statuses: statusesWithSelected, users: usersWithSelected, labels: labelsWithSelected };
 };

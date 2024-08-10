@@ -11,13 +11,6 @@ const getFixtureData = (filename) => JSON.parse(readFixture(filename));
 
 export const getTestData = () => getFixtureData("testData.json");
 
-export const prepareData = async (app) => {
-  const { knex } = app.objection;
-
-  await knex("users").insert(getFixtureData("users.json"));
-  await knex("statuses").insert(getFixtureData("statuses.json"));
-};
-
 export const stringifyValues = (obj) => {
   const object = JSON.parse(JSON.stringify(obj));
 
@@ -48,6 +41,10 @@ export const getUserCookie = async (app, user) => {
   return { [name]: value };
 };
 
+export const createRandomLabel = () => ({
+  name: faker.word.adjective(),
+});
+
 export const createRandomTask = () => ({
   name: faker.lorem.sentence(),
   description: faker.lorem.paragraph(),
@@ -58,6 +55,22 @@ export const createRandomTask = () => ({
 export const createRandomStatus = () => ({
   name: faker.word.adjective(),
 });
+
+export const prepareData = async (app) => {
+  const { knex } = app.objection;
+  const labels = Array(5).fill().map(createRandomLabel);
+
+  await knex("labels").insert(labels);
+  await knex("users").insert(getFixtureData("users.json"));
+  await knex("statuses").insert(getFixtureData("statuses.json"));
+};
+
+export const prepareLabelsData = async (app) => {
+  const { knex } = app.objection;
+  const labels = Array(5).fill().map(createRandomLabel);
+
+  await knex("labels").insert(labels);
+};
 
 export const truncateTables = async (knex) => {
   await Promise.all([knex("tasks").truncate(), knex("users").truncate(), knex("statuses").truncate()]);

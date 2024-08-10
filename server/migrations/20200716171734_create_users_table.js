@@ -1,5 +1,3 @@
-// @ts-check
-
 export const up = (knex) =>
   Promise.all([
     knex.schema.createTable("statuses", (table) => {
@@ -27,6 +25,25 @@ export const up = (knex) =>
       table.timestamp("created_at").defaultTo(knex.fn.now());
       table.timestamp("updated_at").defaultTo(knex.fn.now());
     }),
+    knex.schema.createTable("labels", (table) => {
+      table.increments("id").primary();
+      table.string("name");
+      table.timestamp("created_at").defaultTo(knex.fn.now());
+      table.timestamp("updated_at").defaultTo(knex.fn.now());
+    }),
+    knex.schema.createTable("tasks_labels", (table) => {
+      table.increments("id").primary();
+      table.integer("task_id").references("id").inTable("tasks");
+      table.integer("label_id").references("id").inTable("labels");
+      table.timestamp("created_at").defaultTo(knex.fn.now());
+    }),
   ]);
 
-export const down = (knex) => Promise.all([knex.schema.dropTable("statuses"), knex.schema.dropTable("users")]);
+export const down = (knex) =>
+  Promise.all([
+    knex.schema.dropTable("statuses"),
+    knex.schema.dropTable("users"),
+    knex.schema.dropTable("tasks"),
+    knex.schema.dropTable("labels"),
+    knex.schema.dropTable("tasks_labels"),
+  ]);

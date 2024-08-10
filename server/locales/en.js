@@ -60,6 +60,21 @@ export default {
           success: "Task successfully deleted",
         },
       },
+      labels: {
+        create: {
+          success: "Label created successfully",
+          error: "Failed to create label",
+        },
+        update: {
+          success: "Label updated successfully",
+          error: "Failed to update label",
+          labelConnectedToTask: "You can not delete this label. Label is connected to one or more tasks",
+        },
+        delete: {
+          success: "Label deleted successfully",
+          error: "Failed to delete label",
+        },
+      },
       authError: "Access denied! Please login",
     },
     layouts: {
@@ -70,6 +85,7 @@ export default {
         signOut: "Logout",
         statuses: "Statuses",
         tasks: "Tasks",
+        labels: "Labels",
       },
     },
     views: {
@@ -112,7 +128,7 @@ export default {
         },
         edit: {
           title: "Edit Status",
-          submit: "Edit",
+          submit: "Save",
           error: "Failed to edit status",
         },
         new: {
@@ -133,6 +149,9 @@ export default {
         show: "Show",
         creator: "Author",
         executor: "Executor",
+        is_creator_user: "Only my tasks",
+        labels: "Labels",
+        label: "Label",
         actions: {
           title: "Actions",
           delete: "Delete",
@@ -152,6 +171,28 @@ export default {
           creator: "Author",
           executor: "Executor",
           createdAt: "Creation Date",
+        },
+      },
+      labels: {
+        id: "ID",
+        name: "Name",
+        createdAt: "Creation Date",
+        title: "Labels",
+        create_label_button: "Create Label",
+        actions: {
+          title: "Actions",
+          delete: "Delete",
+          edit: "Edit",
+        },
+        edit: {
+          title: "Edit Label",
+          submit: "Save",
+          error: "Failed to edit label",
+        },
+        new: {
+          title: "Create Label",
+          submit: "Create",
+          create: "Create",
         },
       },
       welcome: {
