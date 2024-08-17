@@ -62,7 +62,6 @@ export const prepareData = async (app) => {
 
   await knex("labels").insert(labels);
   await knex("users").insert(getFixtureData("users.json"));
-  await knex("statuses").insert(getFixtureData("statuses.json"));
 };
 
 export const prepareLabelsData = async (app) => {

@@ -49,7 +49,7 @@ export default (app) => {
       const { id } = req.params;
       const label = await Label.query().findOne({ id });
       const labelWithTasks = await Label.query().findById(id).withGraphFetched("tasks");
-      console.log("🚀 : .delete : labelWithTasks:", labelWithTasks);
+
       if (labelWithTasks.tasks?.length > 0) {
         req.flash("error", i18next.t("flash.labels.edit.labelConnectedToTask"));
         reply.redirect(app.reverse("labels"));
