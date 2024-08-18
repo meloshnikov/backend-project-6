@@ -1,119 +1,82 @@
- 
 import i18next from "i18next";
-import { isAuthoriedUser } from "../helpers/index.js";
+import UserService from "../services/userService.js";
+import TaskService from "../services/taskService.js";
 
 export default (app) => {
-  const User = app.objection.models.user;
+  const userService = new UserService();
+  const taskService = new TaskService();
 
   app
     .get("/users", { name: "users" }, async (req, reply) => {
-      const users = await User.query();
+      const users = await userService.getUsers();
       reply.render("users/index", { users });
       return reply;
     })
     .get("/users/new", { name: "newUser" }, (req, reply) => {
-      const user = new User();
-      reply.render("users/new", { user });
+      reply.render("users/new");
       return reply;
     })
-    .get("/users/:id/edit", async (req, reply) => {
-      const userId = req.params.id;
-      try {
-        const user = await User.query().findById(userId);
-        const sessionUserData = req.user;
-        if (!req.isAuthenticated()) {
-          req.flash("error", i18next.t("flash.users.edit.error.no_auth"));
-          reply.redirect(app.reverse("users"));
-        } else if (!isAuthoriedUser(sessionUserData, user.id)) {
-          req.flash("error", i18next.t("flash.users.edit.error.wrong_auth"));
-          reply.redirect(app.reverse("users"));
-        } else {
-          reply.render("users/edit", { user });
-        }
-      } catch ({ data }) {
-        req.flash("error", i18next.t("flash.users.edit.error.wrong_auth"));
-        reply.redirect(app.reverse("users"));
-      }
-      return reply;
-    })
+    .get(
+      "/users/:id/edit",
+      { preValidation: app.authenticate, preHandler: app.checkUserAuthorization },
+      async (req, reply) => {
+        const user = req.params;
+        reply.render("users/edit", { user });
+        return reply;
+      },
+    )
     .post("/users", async (req, reply) => {
-      const user = new User();
-      user.$set(req.body.data);
-
       try {
-        const validUser = await User.fromJson(req.body.data);
-        await User.query().insert(validUser);
+        await userService.createUser(req.body.data);
         req.flash("info", i18next.t("flash.users.create.success"));
         reply.redirect(app.reverse("root"));
-        await req.logIn(validUser);
-      } catch ({ data }) {
-        const errors = Object.entries(data).reduce((acc, [key, value]) => ({ ...acc, [key]: value[0] }), {});
+      } catch (error) {
+        const errors = error.response?.data || {};
         req.flash("error", i18next.t("flash.users.create.error"));
-        reply.render("users/new", { user, errors });
+        reply.render("users/new", { user: req.body.data, errors });
       }
-
       return reply;
     })
-    .patch("/users/:id", async (req, reply) => {
-      const userId = req.params.id;
-      try {
-        const user = await User.query().findById(userId);
-        const sessionUserData = req.user;
-        if (!req.isAuthenticated()) {
-          req.flash("error", i18next.t("flash.users.edit.error.no_auth"));
-          reply.redirect(app.reverse("users"));
-        } else if (!isAuthoriedUser(sessionUserData, user.id)) {
-          req.flash("error", i18next.t("flash.users.edit.error.wrong_auth"));
-          reply.redirect(app.reverse("users"));
-        } else {
-          await User.fromJson(req.body.data);
-          user.$set(req.body.data);
-          await user.$query().patch();
+    .patch(
+      "/users/:id",
+      { preValidation: app.authenticate, preHandler: app.checkUserAuthorization },
+      async (req, reply) => {
+        const sessionUserId = req.user.id;
+        try {
+          await userService.updateUser({ ...req.body.data, id: sessionUserId });
           req.flash("info", i18next.t("flash.users.edit.success"));
           reply.redirect(app.reverse("users"));
+        } catch (errors) {
+          req.flash("error", i18next.t("flash.users.edit.error.edit"));
+          reply.render("users/edit", { user: { ...req.body.data, id: sessionUserId }, errors: errors.data });
         }
-      } catch ({ data }) {
-        req.flash("error", i18next.t("flash.users.edit.error.edit"));
-        reply.render("users/edit", { user: { ...req.body.data, id: userId }, errors: data });
-      }
 
-      return reply;
-    })
-    .delete("/users/:id", async (req, reply) => {
-      try {
+        return reply;
+      },
+    )
+    .delete(
+      "/users/:id",
+      { preValidation: app.authenticate, preHandler: app.checkUserAuthorization },
+      async (req, reply) => {
         const userId = req.params.id;
-        const user = await User.query().findById(userId);
-        const sessionUserData = req.user;
+        const tasks = await taskService.getTasksByUserId(userId);
 
-        if (!req.isAuthenticated()) {
-          req.flash("error", i18next.t("flash.users.edit.error.no_auth"));
+        if (tasks.length > 0) {
+          req.flash("error", i18next.t("flash.users.edit.userConnectedToTask"));
           reply.redirect(app.reverse("users"));
-        } else if (!isAuthoriedUser(sessionUserData, user.id)) {
-          req.flash("error", i18next.t("flash.users.edit.error.wrong_auth"));
+          return reply;
+        }
+
+        try {
+          userService.deleteUser(userId);
+          req.logOut();
+          req.flash("info", i18next.t("flash.users.delete.success"));
           reply.redirect(app.reverse("users"));
-        } else {
-          try {
-            const deletedUser = await User.query().deleteById(userId);
-            if (deletedUser !== 1) {
-              throw Error;
-            }
-            req.logOut();
-            req.flash("info", i18next.t("flash.users.delete.success"));
-            reply.redirect(app.reverse("users"));
-            return reply;
-          } catch {
-            throw Error("User can't be deleted");
-          }
+        } catch (e) {
+          req.flash("error", i18next.t("flash.users.delete.error"));
+          reply.render("", { errors: e });
         }
         return reply;
-      } catch (error) {
-        if (error.message === "User can't be deleted") {
-          req.flash("error", i18next.t("flash.users.delete.error.default"));
-        } else {
-          req.flash("error", i18next.t("flash.users.delete.error.auth"));
-        }
-        reply.redirect(app.reverse("users"));
-        return reply;
-      }
-    });
+      },
+    );
 };

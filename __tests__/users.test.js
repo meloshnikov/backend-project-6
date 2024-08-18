@@ -57,12 +57,31 @@ describe("test users CRUD", () => {
     expect(edittedUser).toMatchObject(expected);
   });
 
+  it("update with wrong auth", async () => {
+    const newUser = testData.users.edit;
+    const existUser = await models.user.query().findOne({ email: testData.users.existing.email });
+    const wrongCookies = await getUserCookie(app, testData.users.new);
+    const { statusCode } = await executeCrudRequest("PATCH", ["users", existUser.id], newUser, wrongCookies);
+    const edittedUser = await models.user.query().findById(existUser.id);
+    expect(statusCode).toBe(302);
+    expect(edittedUser).toMatchObject(existUser);
+  });
+
+  it("delete with wrong auth", async () => {
+    const existUser = await models.user.query().findOne({ email: testData.users.edit.email });
+    const wrongCookies = await getUserCookie(app, testData.users.existing);
+    const { statusCode } = await executeCrudRequest("DELETE", ["users", existUser.id], null, wrongCookies);
+    const deletedUser = await models.user.query().findById(existUser.id);
+    expect(statusCode).toBe(302);
+    expect(deletedUser).toBeTruthy();
+  });
+
   it("delete", async () => {
     const existUser = await models.user.query().findOne({ email: testData.users.edit.email });
     const { statusCode } = await executeCrudRequest("DELETE", ["users", existUser.id]);
-    const deletedTask = await models.status.query().findById(existUser.id);
+    const deletedUser = await models.status.query().findById(existUser.id);
     expect(statusCode).toBe(302);
-    expect(deletedTask).toBeFalsy();
+    expect(deletedUser).toBeFalsy();
   });
 
   afterAll(async () => {

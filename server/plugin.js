@@ -95,12 +95,20 @@ const registerPlugins = async (app) => {
   await app.register(fastifyPassport.initialize());
   await app.register(fastifyPassport.secureSession());
   await app.decorate("fp", fastifyPassport);
-  app.decorate("authenticate", (...args) =>
+  await app.decorate("authenticate", (...args) =>
     fastifyPassport.authenticate("form", {
       failureRedirect: app.reverse("root"),
       failureFlash: i18next.t("flash.authError"),
     })(...args),
   );
+  await app.decorate("checkUserAuthorization", (req, reply, done) => {
+    if (req.user.id !== Number(req.params.id)) {
+      req.flash("error", i18next.t("flash.users.edit.error.wrong_auth"));
+      reply.redirect(app.reverse("users"));
+      return reply;
+    }
+    return done();
+  });
 
   await app.register(fastifyMethodOverride);
   await app.register(fastifyObjectionjs, {

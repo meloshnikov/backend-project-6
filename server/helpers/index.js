@@ -29,13 +29,13 @@ export default (app) => ({
 
 export const isAuthoriedUser = (sessionUser, requiredUserId) => sessionUser.id === requiredUserId;
 
-export const redirectToRootIfNotAuthenticated = (app) => (req, reply, next) => {
+export const requireAuthentication = (app) => (req, reply, next) => {
   if (!req.isAuthenticated()) {
-    req.flash("error", i18next.t("flash.users.edit.error.noAuth"));
-    return reply.redirect(app.reverse("root"));
+    req.flash("error", i18next.t("flash.users.edit.error.no_auth"));
+    reply.redirect(app.reverse("users"));
+  } else {
+    next();
   }
-
-  return next();
 };
 
 export const formDataToTask = (req, res, next) => {
