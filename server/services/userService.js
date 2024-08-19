@@ -21,7 +21,7 @@ class UserService {
     await user.$query().patch();
   };
 
-  deleteUser = async (userId) => {
+  deleteById = async (userId) => {
     const user = await this.getUserById(userId);
     await user.$query().delete();
   };

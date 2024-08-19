@@ -1,24 +1,23 @@
 import i18next from "i18next";
-import { requireAuthentication } from "../helpers/index.js";
+import { StatusService } from "../services";
 
 export default (app) => {
-  const Status = app.objection.models.status;
+  const statusService = new StatusService();
 
   app
-    .get("/statuses", { name: "statuses", preHandler: requireAuthentication(app) }, async (req, reply) => {
-      const statuses = await Status.query();
+    .get("/statuses", { name: "statuses", preValidation: app.authenticate }, async (req, reply) => {
+      const statuses = await statusService.getStatuses();
       reply.render("statuses/index", { statuses });
       return reply;
     })
-    .get("/statuses/new", { name: "newStatus", preHandler: requireAuthentication(app) }, (req, reply) => {
-      const status = new Status();
-      reply.render("statuses/new", { status });
+    .get("/statuses/new", { name: "newStatus", preValidation: app.authenticate }, async (req, reply) => {
+      reply.render("statuses/new");
       return reply;
     })
-    .get("/statuses/:id/edit", { preHandler: requireAuthentication(app) }, async (req, reply) => {
+    .get("/statuses/:id/edit", { preValidation: app.authenticate }, async (req, reply) => {
       const statusId = req.params.id;
       try {
-        const status = await Status.query().findById(statusId);
+        const status = await statusService.getStatusById(statusId);
         reply.render("statuses/edit", { status });
       } catch ({ data }) {
         req.flash("error", i18next.t("flash.statuses.edit.error"));
@@ -26,42 +25,34 @@ export default (app) => {
       }
       return reply;
     })
-    .post("/statuses", { preHandler: requireAuthentication(app) }, async (req, reply) => {
-      const status = new Status();
-      status.$set(req.body.data);
-
+    .post("/statuses", { preValidation: app.authenticate }, async (req, reply) => {
+      const status = req.body.data;
       try {
-        const validStatus = await Status.fromJson(req.body.data);
-        await Status.query().insert(validStatus);
+        await statusService.createStatus(status);
         req.flash("info", i18next.t("flash.statuses.create.success"));
         reply.redirect(app.reverse("statuses"));
       } catch ({ data }) {
         req.flash("error", i18next.t("flash.statuses.create.error"));
         reply.render("statuses/new", { status, errors: data });
       }
-
       return reply;
     })
-    .patch("/statuses/:id", { preHandler: requireAuthentication(app) }, async (req, reply) => {
-      const statusId = req.params.id;
+    .patch("/statuses/:id", { preValidation: app.authenticate }, async (req, reply) => {
+      const statusId = Number(req.params.id);
       try {
-        const status = await Status.query().findById(statusId);
-        await Status.fromJson(req.body.data);
-        status.$set(req.body.data);
-        await status.$query().patch();
+        await statusService.updateStatus({ ...req.body.data, id: statusId });
         req.flash("info", i18next.t("flash.statuses.edit.success"));
         reply.redirect(app.reverse("statuses"));
       } catch ({ data }) {
         req.flash("error", i18next.t("flash.statuses.edit.error"));
         reply.render("statuses/edit", { status: { ...req.body.data, id: statusId }, errors: data });
       }
-
       return reply;
     })
-    .delete("/statuses/:id", { preHandler: requireAuthentication(app) }, async (req, reply) => {
+    .delete("/statuses/:id", { preValidation: app.authenticate }, async (req, reply) => {
       try {
         const statusId = req.params.id;
-        await Status.query().deleteById(statusId);
+        await statusService.deleteById(statusId);
         req.flash("info", i18next.t("flash.statuses.delete.success"));
         reply.redirect(app.reverse("statuses"));
         return reply;
