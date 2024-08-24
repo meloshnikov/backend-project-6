@@ -1,161 +1,95 @@
 import i18next from "i18next";
-import { getDataByModels, processData } from "../helpers/index.js";
+import { getDataByServices, processData, adaptTaskData, getLabelIds, getFilterConditions } from "../helpers/index.js";
+import { TaskService, UserService, StatusService, LabelService } from "../services";
 
 export default (app) => {
-  const Task = app.objection.models.task;
-  const Status = app.objection.models.status;
-  const User = app.objection.models.user;
-  const Label = app.objection.models.label;
+  const taskService = new TaskService();
+  const statusService = new StatusService();
+  const userService = new UserService();
+  const labelService = new LabelService();
+
   app
     .get("/tasks", { name: "tasks", preValidation: app.authenticate }, async (req, reply) => {
-      const { statuses, users, labels } = await getDataByModels(Status, User, Label);
+      const { statuses, users, labels } = await getDataByServices(statusService, userService, labelService);
       const form = {};
-      let query = Task.query().withGraphFetched("[status, creator, executor, labels]");
-      if (req.query.isCreatorUser) {
-        query = query.where("creatorId", req.user.id);
-        form.isCreatorUser = true;
-      }
-      if (req.query.status) {
-        query = query.where("statusId", req.query.status);
-        form.statusId = Number(req.query.status);
-      }
-      if (req.query.executor) {
-        query = query.where("executorId", req.query.executor);
-        form.executorId = Number(req.query.executor);
-      }
-      if (req.query.label) {
-        query = query.joinRelated("labels").where("labels.id", req.query.label);
-        form.labelId = Number(req.query.label);
-      } else {
-        query = query.withGraphFetched("labels");
-      }
-      const tasks = await query;
-      reply.render("/tasks/index", {
-        tasks,
-        statuses,
-        users,
-        labels,
-        form,
-      });
+      let query;
 
+      const filterConditions = getFilterConditions(req);
+
+      if (Object.values(filterConditions).some((condition) => condition)) {
+        query = taskService.getTasksWithRelations().where(filterConditions);
+      } else {
+        query = taskService.getTasksWithRelations();
+      }
+
+      const tasks = await query;
+      reply.render("/tasks/index", { tasks, statuses, users, labels, form });
       return reply;
     })
     .get("/tasks/new", { name: "newTask", preValidation: app.authenticate }, async (req, reply) => {
-      const task = new Task();
-      const { statuses, users, labels } = await getDataByModels(Status, User, Label);
-      reply.render("tasks/new", {
-        task,
-        statuses,
-        users,
-        labels,
-      });
+      const task = {};
+      const { statuses, users, labels } = await getDataByServices(statusService, userService, labelService);
+      reply.render("tasks/new", { task, statuses, users, labels });
       return reply;
     })
     .get("/tasks/:id", { name: "viewTask" }, async (req, reply) => {
       const { id } = req.params;
-      const task = await Task.query().findOne({ id }).withGraphFetched("[status, creator, executor, labels]");
+      const task = await taskService.getTasksWithRelationsById(id);
       reply.render("/tasks/view", { task });
       return reply;
     })
     .get("/tasks/:id/edit", { name: "taskUpdate", preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
-      const task = await Task.query().findOne({ id });
-      const { statuses, users, labels } = await getDataByModels(Status, User, Label);
+      const task = await await taskService.getTaskById(id);
+      const { statuses, users, labels } = await getDataByServices(statusService, userService, labelService);
       const relatedData = await processData(task, statuses, users, labels);
-      reply.render("tasks/edit", {
-        task,
-        ...relatedData,
-      });
+      reply.render("tasks/edit", { task, ...relatedData });
       return reply;
     })
     .post("/tasks", { preValidation: app.authenticate }, async (req, reply) => {
-      const task = new Task();
       try {
-        const labelIds = [req.body.data?.labels ?? []].flat();
-        const labels = await Label.query().whereIn("id", labelIds);
-        const taskData = {
-          name: req.body.data.name,
-          description: req.body.data.description,
-          statusId: Number(req.body.data.statusId),
-          executorId: Number(req.body.data.executorId),
-          creatorId: req.user.id,
-          labels,
-        };
-        await Task.transaction(async (trx) => {
-          const insertedTask = await Task.query(trx).allowGraph("labels").upsertGraph(taskData, {
-            relate: true,
-            unrelate: true,
-            noDelete: true,
-          });
-          return insertedTask;
-        });
+        const labelIds = getLabelIds(req);
+        const labels = await labelService.getLabelsbyIds(labelIds);
+        const taskData = { ...adaptTaskData(req), labels };
+        await taskService.saveTask(taskData);
         req.flash("info", i18next.t("flash.tasks.create.success"));
         reply.redirect(app.reverse("tasks"));
       } catch ({ data }) {
         req.flash("error", i18next.t("flash.tasks.create.error"));
-        const statuses = await Status.query();
-        const users = await User.query();
-        const labels = await Label.query();
-        reply.render("tasks/new", {
-          task,
-          statuses,
-          users,
-          labels,
-          errors: data,
-        });
+        const statuses = await statusService.getStatuses();
+        const users = await userService.getUsers();
+        const labels = await labelService.getLabels();
+        reply.render("tasks/new", { statuses, users, labels, errors: data });
       }
       return reply;
     })
     .patch("/tasks/:id", { preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
-      const task = await Task.query().findOne({ id });
+      const task = await taskService.getTaskById(id);
       try {
-        const labelIds = [req.body.data?.labels ?? []].flat().map(Number);
-        const labels = await Label.query().whereIn("id", labelIds);
-        const taskData = {
-          id: Number(id),
-          name: req.body.data.name,
-          description: req.body.data.description,
-          statusId: Number(req.body.data.statusId),
-          executorId: Number(req.body.data.executorId),
-          creatorId: task.creatorId,
-          labels,
-        };
-        await Task.transaction(async (trx) => {
-          const updatedTask = await Task.query(trx).allowGraph("labels").upsertGraph(taskData, {
-            relate: true,
-            unrelate: true,
-            noDelete: true,
-          });
-
-          return updatedTask;
-        });
+        const labelIds = getLabelIds(req);
+        const labels = await labelService.getLabelsbyIds(labelIds);
+        const taskData = { ...adaptTaskData(req), labels };
+        await taskService.saveTask(taskData);
         req.flash("info", i18next.t("flash.tasks.update.success"));
         reply.redirect(app.reverse("tasks"));
       } catch (e) {
         req.flash("error", i18next.t("flash.tasks.update.error"));
-        const { statuses, users, labels } = await getDataByModels(Status, User, Label);
+        const { statuses, users, labels } = await getDataByServices(statusService, userService, labelService);
         const relatedData = await processData(task, statuses, users, labels);
-        reply.render("tasks/edit", {
-          task,
-          ...relatedData,
-        });
+        reply.render("tasks/edit", { task, ...relatedData });
       }
       return reply;
     })
     .delete("/tasks/:id", { preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
-      const task = await Task.query().findOne({ id });
       try {
-        Task.transaction(async (trx) => {
-          await task.$relatedQuery("labels", trx).unrelate();
-          await task.$query(trx).delete();
-        });
+        await taskService.deleteTaskWithRelations(id);
         req.flash("info", i18next.t("flash.tasks.delete.success"));
         reply.redirect(app.reverse("tasks"));
       } catch ({ data }) {
         req.flash("error", i18next.t("flash.tasks.delete.error"));
-        reply.redirect(app.reverse("tasks"), { task, errors: data });
+        reply.redirect(app.reverse("tasks"), { errors: data });
       }
       return reply;
     });

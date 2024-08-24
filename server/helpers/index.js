@@ -62,8 +62,8 @@ export const getSelectedItems = (items, ids) =>
     selected: ids.includes(item.id),
   }));
 
-export const getDataByModels = async (Status, User, Label) => {
-  const [statuses, users, labels] = await Promise.all([Status.query(), User.query(), Label.query()]);
+export const getDataByServices = async (Status, User, Label) => {
+  const [statuses, users, labels] = await Promise.all([Status.getStatuses(), User.getUsers(), Label.getLabels()]);
   return { statuses, users, labels };
 };
 
@@ -77,3 +77,20 @@ export const processData = async (task, statuses, users, labels) => {
 
   return { statuses: statusesWithSelected, users: usersWithSelected, labels: labelsWithSelected };
 };
+
+export const adaptTaskData = (req) => ({
+  name: req.body.data.name,
+  description: req.body.data.description,
+  statusId: Number(req.body.data.statusId),
+  executorId: Number(req.body.data.executorId),
+  creatorId: Number(req.user.id),
+});
+
+export const getLabelIds = (req) => [req.body.data?.labels ?? []].flat().map(Number);
+
+export const getFilterConditions = (req) => ({
+  isCreatorUser: req.query.isCreatorUser ? { field: "creatorId", operator: "=", value: req.user.id } : null,
+  status: req.query.status ? { field: "statusId", operator: "=", value: Number(req.query.status) } : null,
+  executor: req.query.executor ? { field: "executorId", operator: "=", value: Number(req.query.executor) } : null,
+  label: req.query.label ? { field: "id", operator: "in", value: [Number(req.query.label)] } : null,
+});

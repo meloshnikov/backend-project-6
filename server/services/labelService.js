@@ -27,6 +27,8 @@ class LabelService {
   };
 
   getlabelWithTasks = async (labelId) => this.labelModel.query().findById(labelId).withGraphFetched("tasks");
+
+  getLabelsbyIds = async (labelIds) => this.labelModel.query().whereIn("id", labelIds);
 }
 
 export default LabelService;
