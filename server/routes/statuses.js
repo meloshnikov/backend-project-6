@@ -1,5 +1,5 @@
 import i18next from "i18next";
-import { StatusService } from "../services";
+import { StatusService } from "../services/index.js";
 
 export default (app) => {
   const statusService = new StatusService();

@@ -1,5 +1,5 @@
 import i18next from "i18next";
-import { TaskService, UserService } from "../services";
+import { TaskService, UserService } from "../services/index.js";
 
 export default (app) => {
   const userService = new UserService();

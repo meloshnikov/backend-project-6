@@ -1,6 +1,4 @@
-import UserService from "./userService.js";
-import TaskService from "./taskService.js";
-import StatusService from "./statusService.js";
-import LabelService from "./labelService.js";
-
-export { UserService, TaskService, StatusService, LabelService };
+export { default as UserService } from "./userService.js";
+export { default as TaskService } from "./taskService.js";
+export { default as StatusService } from "./statusService.js";
+export { default as LabelService } from "./labelService.js";

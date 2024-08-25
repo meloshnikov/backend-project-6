@@ -1,6 +1,6 @@
 import i18next from "i18next";
 import { getDataByServices, processData, adaptTaskData, getLabelIds, getFilterConditions } from "../helpers/index.js";
-import { TaskService, UserService, StatusService, LabelService } from "../services";
+import { TaskService, UserService, StatusService, LabelService } from "../services/index.js";
 
 export default (app) => {
   const taskService = new TaskService();
