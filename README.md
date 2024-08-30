@@ -1,5 +1,19 @@
-### Hexlet tests and linter status:
-[![Actions Status](https://github.com/meloshnikov/backend-project-6/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/meloshnikov/backend-project-6/actions)
+<h2 align="center"> Backend-project-6 </h2>
+
+<div align="center">
+	<a href="https://github.com/meloshnikov/backend-project-6/actions">
+		<img src="https://github.com/meloshnikov/backend-project-6/actions/workflows/hexlet-check.yml/badge.svg" />
+	</a>
+  <a href="https://github.com/meloshnikov/backend-project-6/actions">
+		<img src="https://github.com/meloshnikov/backend-project-6/actions/workflows/project-check.yml/badge.svg" />
+	</a>
+  <a href="https://codeclimate.com/github/meloshnikov/backend-project-6/maintainability">
+    <img src="https://api.codeclimate.com/v1/badges/9c282111dfea8ba9dc8a/maintainability" />
+  </a>
+  <a href="https://codeclimate.com/github/meloshnikov/backend-project-6/test_coverage">
+    <img src="https://api.codeclimate.com/v1/badges/9c282111dfea8ba9dc8a/test_coverage" />
+  </a>
+</div>
 
 ## Setup
 
