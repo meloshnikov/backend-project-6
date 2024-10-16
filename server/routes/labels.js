@@ -17,7 +17,7 @@ export default (app) => {
       const labelId = req.params.id;
       try {
         const label = await labelService.getLabelById(labelId);
-        reply.render("labels/edit", { label: label[0] });
+        reply.render("labels/edit", { label });
       } catch ({ data }) {
         req.flash("error", i18next.t("flash.labels.edit.error"));
         reply.redirect(app.reverse("labels"));

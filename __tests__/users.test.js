@@ -67,6 +67,12 @@ describe("test users CRUD", () => {
     expect(edittedUser).toMatchObject(existUser);
   });
 
+  it("update user not found", async () => {
+    const nonExistentId = "non-existent-id";
+    const { statusCode } = await executeCrudRequest("GET", ["users", nonExistentId]);
+    expect(statusCode).toBe(404);
+  });
+
   it("delete with wrong auth", async () => {
     const existUser = await models.user.query().findOne({ email: testData.users.edit.email });
     const wrongCookies = await getUserCookie(app, testData.users.existing);

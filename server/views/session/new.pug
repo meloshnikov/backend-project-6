@@ -9,9 +9,9 @@ block content
       .card.shadow-sm
         .card-body.row.p-5
           .col-12.col-md-6.d-flex.align-items-center.justify-content-center
-            img.rounded-circle(src=assetPath("pic.jpg"))
+            img.rounded-circle(src=assetPath("login.jpg"))
           .col-12.col-md-6.mt-3.mt-mb-0
             +formFor()(action=route('session') method='post')
               +input(signInForm, 'email', t('views.users.email'), errors)(type="text")
-              +input(signInForm, 'password', t('views.users.password'), errors)(type="password")
+              +input(signInForm, 'password', t('views.users.password'))(type="password")
               +submit(signInForm)(value=t('views.session.new.submit'))

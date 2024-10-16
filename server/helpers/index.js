@@ -78,19 +78,23 @@ export const processData = async (task, statuses, users, labels) => {
   return { statuses: statusesWithSelected, users: usersWithSelected, labels: labelsWithSelected };
 };
 
-export const adaptTaskData = (req) => ({
-  name: req.body.data.name,
-  description: req.body.data.description,
-  statusId: Number(req.body.data.statusId),
-  executorId: Number(req.body.data.executorId),
-  creatorId: Number(req.user.id),
-});
+export const adaptTaskData = (req) => {
+  const data = {
+    name: req.body.data.name,
+    description: req.body.data.description,
+    statusId: Number(req.body.data.statusId),
+    executorId: Number(req.body.data.executorId),
+    creatorId: Number(req.user.id),
+  };
+
+  return req.params.id ? { id: Number(req.params.id), ...data } : data;
+};
 
 export const getLabelIds = (req) => [req.body.data?.labels ?? []].flat().map(Number);
 
 export const getFilterConditions = (req) => ({
-  isCreatorUser: req.query.isCreatorUser ? { field: "creatorId", operator: "=", value: req.user.id } : null,
-  status: req.query.status ? { field: "statusId", operator: "=", value: Number(req.query.status) } : null,
-  executor: req.query.executor ? { field: "executorId", operator: "=", value: Number(req.query.executor) } : null,
-  label: req.query.label ? { field: "id", operator: "in", value: [Number(req.query.label)] } : null,
+  statusId: req.query.status ? Number(req.query.status) : null,
+  executorId: req.query.executor ? Number(req.query.executor) : null,
+  creatorId: req.query.isCreatorUser ? req.user.id : null,
+  labels: req.query.label ? [Number(req.query.label)] : null,
 });
