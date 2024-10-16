@@ -18,7 +18,7 @@ export const up = (knex) =>
     knex.schema.createTable("tasks", (table) => {
       table.increments("id").primary();
       table.string("name").notNullable();
-      table.string("description");
+      table.string("description").notNullable();
       table.integer("status_id").unsigned().notNullable().references("statuses.id");
       table.integer("creator_id").unsigned().notNullable().references("users.id");
       table.integer("executor_id").unsigned().references("users.id");

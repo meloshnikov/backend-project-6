@@ -16,7 +16,8 @@ export default (app) => {
       return reply;
     })
     .get("/users/:id/edit", { preValidation: app.authenticate, preHandler: app.checkUserAuthorization }, async (req, reply) => {
-      const user = req.params;
+      const userId = req.params.id;
+      const user = await userService.getUserById(userId);
       reply.render("users/edit", { user });
       return reply;
     })
@@ -25,10 +26,9 @@ export default (app) => {
         await userService.createUser(req.body.data);
         req.flash("info", i18next.t("flash.users.create.success"));
         reply.redirect(app.reverse("root"));
-      } catch (error) {
-        const errors = error.response?.data || {};
+      } catch (errors) {
         req.flash("error", i18next.t("flash.users.create.error"));
-        reply.render("users/new", { user: req.body.data, errors });
+        reply.render("users/new", { user: req.body.data, errors: errors.data });
       }
       return reply;
     })

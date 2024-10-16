@@ -57,7 +57,7 @@ export default {
         },
         delete: {
           error: "Задачу может удалить только её автор",
-          success: "Задача успешно удалёна",
+          success: "Задача успешно удалена",
         },
       },
       labels: {
@@ -118,7 +118,7 @@ export default {
       },
       statuses: {
         id: "ID",
-        name: "Полное имя",
+        name: "Наименование",
         createdAt: "Дата создания",
         title: "Статусы",
         create_status_button: "Создать статус",
@@ -129,7 +129,7 @@ export default {
         },
         edit: {
           title: "Изменение статуса",
-          submit: "Сохранить",
+          submit: "Изменить",
           error: "Не удалось изменить статус",
         },
         new: {
@@ -176,7 +176,7 @@ export default {
       },
       labels: {
         id: "ID",
-        name: "Полное имя",
+        name: "Наименование",
         createdAt: "Дата создания",
         title: "Метки",
         create_label_button: "Создать метку",
@@ -186,9 +186,9 @@ export default {
           edit: "Изменить",
         },
         edit: {
-          title: "Изменение статуса",
+          title: "Изменение метки",
           submit: "Изменить",
-          error: "Не удалось изменить статус",
+          error: "Не удалось изменить метку",
         },
         new: {
           title: "Создание метки",
