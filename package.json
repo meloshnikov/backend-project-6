@@ -12,11 +12,12 @@
     "test": "jest --verbose --runInBand",
     "build": "webpack",
     "start": "fastify start server/plugin.js -l debug -P -o -p 5000 -a 0.0.0.0",
+    "lint": "eslint . --fix",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
     "prepare": "husky install"
   },
   "lint-staged": {
-    "*": "prettier --write --ignore-unknown --loglevel warn",
-    "*.js": "eslint . --ext js --report-unused-disable-directives --fix"
+    "*.js": "eslint . --ext js --report-unused-disable-directives"
   },
   "jest": {
     "modulePathIgnorePatterns": [

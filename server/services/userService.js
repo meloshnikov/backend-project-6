@@ -1,4 +1,4 @@
-import User from "../models/User.cjs";
+import User from '../models/User.cjs';
 
 class UserService {
   constructor() {

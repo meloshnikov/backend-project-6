@@ -1,4 +1,4 @@
-import Status from "../models/Status.cjs";
+import Status from '../models/Status.cjs';
 
 class StatusService {
   constructor() {

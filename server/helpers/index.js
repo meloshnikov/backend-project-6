@@ -1,5 +1,5 @@
-import i18next from "i18next";
-import _ from "lodash";
+import i18next from 'i18next';
+import _ from 'lodash';
 
 export default (app) => ({
   route(name) {
@@ -11,12 +11,12 @@ export default (app) => ({
   _,
   getAlertClass(type) {
     switch (type) {
-      case "error":
-        return "danger";
-      case "success":
-        return "success";
-      case "info":
-        return "info";
+      case 'error':
+        return 'danger';
+      case 'success':
+        return 'success';
+      case 'info':
+        return 'info';
       default:
         throw new Error(`Unknown flash type: '${type}'`);
     }
@@ -31,8 +31,8 @@ export const isAuthoriedUser = (sessionUser, requiredUserId) => sessionUser.id =
 
 export const requireAuthentication = (app) => (req, reply, next) => {
   if (!req.isAuthenticated()) {
-    req.flash("error", i18next.t("flash.users.edit.error.no_auth"));
-    reply.redirect(app.reverse("users"));
+    req.flash('error', i18next.t('flash.users.edit.error.no_auth'));
+    reply.redirect(app.reverse('users'));
   } else {
     next();
   }
@@ -40,7 +40,7 @@ export const requireAuthentication = (app) => (req, reply, next) => {
 
 export const formDataToTask = (req, res, next) => {
   Object.keys(req.body.data)
-    .filter((key) => key.includes("Id"))
+    .filter((key) => key.includes('Id'))
     .forEach((key) => {
       if (_.isEmpty(req.body.data[key])) {
         delete req.body.data[key];
@@ -56,19 +56,23 @@ export const formDataToTask = (req, res, next) => {
   next();
 };
 
-export const getSelectedItems = (items, ids) =>
-  items.map((item) => ({
+export const getSelectedItems = (items, ids) => items
+  .map((item) => ({
     ...item,
     selected: ids.includes(item.id),
   }));
 
 export const getDataByServices = async (Status, User, Label) => {
-  const [statuses, users, labels] = await Promise.all([Status.getStatuses(), User.getUsers(), Label.getLabels()]);
+  const [
+    statuses,
+    users,
+    labels,
+  ] = await Promise.all([Status.getStatuses(), User.getUsers(), Label.getLabels()]);
   return { statuses, users, labels };
 };
 
 export const processData = async (task, statuses, users, labels) => {
-  const relatedLabels = await task.$relatedQuery("labels");
+  const relatedLabels = await task.$relatedQuery('labels');
   const relatedLabelsIds = relatedLabels.map((label) => label.id);
 
   const statusesWithSelected = getSelectedItems(statuses, [task.statusId]);

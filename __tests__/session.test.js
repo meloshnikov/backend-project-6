@@ -1,8 +1,10 @@
-import fastify from "fastify";
-import init from "../server/plugin.js";
-import { getTestData, prepareData } from "./helpers/index.js";
+import fastify from 'fastify';
 
-describe("test session", () => {
+import init from '../server/plugin.js';
+
+import { getTestData, prepareData } from './helpers/index.js';
+
+describe('test session', () => {
   let app;
   let knex;
   let testData;
@@ -10,7 +12,7 @@ describe("test session", () => {
   beforeAll(async () => {
     app = fastify({
       exposeHeadRoutes: false,
-      logger: { target: "pino-pretty" },
+      logger: { target: 'pino-pretty' },
     });
     await init(app);
     knex = app.objection.knex;
@@ -19,17 +21,17 @@ describe("test session", () => {
     testData = getTestData();
   });
 
-  it("test sign in / sign out", async () => {
+  it('test sign in / sign out', async () => {
     const response = await app.inject({
-      method: "GET",
-      url: app.reverse("newSession"),
+      method: 'GET',
+      url: app.reverse('newSession'),
     });
 
     expect(response.statusCode).toBe(200);
 
     const responseSignIn = await app.inject({
-      method: "POST",
-      url: app.reverse("session"),
+      method: 'POST',
+      url: app.reverse('session'),
       payload: {
         data: testData.users.existing,
       },
@@ -41,8 +43,8 @@ describe("test session", () => {
     const cookie = { [name]: value };
 
     const responseSignOut = await app.inject({
-      method: "DELETE",
-      url: app.reverse("session"),
+      method: 'DELETE',
+      url: app.reverse('session'),
       cookies: cookie,
     });
 

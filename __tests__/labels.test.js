@@ -1,5 +1,7 @@
-import { fastify } from "fastify";
-import init from "../server/plugin.js";
+import { fastify } from 'fastify';
+
+import init from '../server/plugin.js';
+
 import {
   prepareLabelsData,
   createRandomLabel,
@@ -7,9 +9,9 @@ import {
   getUserCookie,
   createExecuteCrudRequest,
   getTestData,
-} from "./helpers/index.js";
+} from './helpers/index.js';
 
-describe("test labels CRUD", () => {
+describe('test labels CRUD', () => {
   let app;
   let knex;
   let models;
@@ -20,7 +22,7 @@ describe("test labels CRUD", () => {
   beforeAll(async () => {
     app = fastify({
       exposeHeadRoutes: false,
-      logger: { target: "pino-pretty" },
+      logger: { target: 'pino-pretty' },
     });
     await init(app);
     knex = app.objection.knex;
@@ -36,45 +38,45 @@ describe("test labels CRUD", () => {
     await prepareLabelsData(app);
   });
 
-  it("index", async () => {
-    const { statusCode } = await executeCrudRequest("GET", ["labels"]);
+  it('index', async () => {
+    const { statusCode } = await executeCrudRequest('GET', ['labels']);
     expect(statusCode).toBe(200);
   });
 
-  it("new", async () => {
-    const { statusCode } = await executeCrudRequest("GET", ["newLabel"]);
+  it('new', async () => {
+    const { statusCode } = await executeCrudRequest('GET', ['newLabel']);
     expect(statusCode).toBe(200);
   });
 
-  it("create", async () => {
+  it('create', async () => {
     const newLabel = createRandomLabel();
-    const { statusCode } = await executeCrudRequest("POST", ["labels"], newLabel);
+    const { statusCode } = await executeCrudRequest('POST', ['labels'], newLabel);
     expect(statusCode).toBe(302);
     const addedTask = await models.label.query().findOne({ name: newLabel.name });
     expect(addedTask).toMatchObject(newLabel);
   });
 
-  it("update", async () => {
+  it('update', async () => {
     const newLabel = createRandomLabel();
     const existLabel = await models.label.query().first();
-    const { statusCode } = await executeCrudRequest("PATCH", ["labels", existLabel.id], newLabel);
+    const { statusCode } = await executeCrudRequest('PATCH', ['labels', existLabel.id], newLabel);
     expect(statusCode).toBe(302);
     const updatedTask = await models.label.query().findOne({ name: newLabel.name });
     expect(updatedTask).toMatchObject(newLabel);
   });
 
-  it("delete", async () => {
+  it('delete', async () => {
     const existLabel = await models.label.query().first();
-    const { statusCode } = await executeCrudRequest("DELETE", ["labels", existLabel.id]);
+    const { statusCode } = await executeCrudRequest('DELETE', ['labels', existLabel.id]);
     const deletedLabel = await models.label.query().findById(existLabel.id);
     expect(statusCode).toBe(302);
     expect(deletedLabel).toBeFalsy();
   });
 
-  it("delete with wrong auth", async () => {
+  it('delete with wrong auth', async () => {
     const existLabel = await models.label.query().first();
     const wrongCookies = await getUserCookie(app, testData.users.edit);
-    const { statusCode } = await executeCrudRequest("DELETE", ["labels", existLabel.id], null, wrongCookies);
+    const { statusCode } = await executeCrudRequest('DELETE', ['labels', existLabel.id], null, wrongCookies);
     const deletedLabel = await models.label.query().findById(existLabel.id);
     expect(statusCode).toBe(302);
     expect(deletedLabel).toBeTruthy();

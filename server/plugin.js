@@ -1,33 +1,33 @@
-/* eslint-disable import/namespace */
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-import { fileURLToPath } from "url";
-import path from "path";
-import fastifyStatic from "@fastify/static";
 // NOTE: не поддердивает fastify 4.x
 // import fastifyErrorPage from 'fastify-error-page';
-import fastifyView from "@fastify/view";
-import fastifyFormbody from "@fastify/formbody";
-import fastifySecureSession from "@fastify/secure-session";
-import fastifyPassport from "@fastify/passport";
-import fastifySensible from "@fastify/sensible";
-import { plugin as fastifyReverseRoutes } from "fastify-reverse-routes";
-import fastifyMethodOverride from "fastify-method-override";
-import fastifyObjectionjs from "fastify-objectionjs";
-import qs from "qs";
-import Pug from "pug";
-import i18next from "i18next";
+import fastifyFormbody from '@fastify/formbody';
+import fastifyPassport from '@fastify/passport';
+import fastifySecureSession from '@fastify/secure-session';
+import fastifySensible from '@fastify/sensible';
+import fastifyStatic from '@fastify/static';
+import fastifyView from '@fastify/view';
+import fastifyMethodOverride from 'fastify-method-override';
+import fastifyObjectionjs from 'fastify-objectionjs';
+import { plugin as fastifyReverseRoutes } from 'fastify-reverse-routes';
+import i18next from 'i18next';
+import Pug from 'pug';
+import qs from 'qs';
 
-import ru from "./locales/ru.js";
-import en from "./locales/en.js";
-import addRoutes from "./routes/index.js";
-import getHelpers from "./helpers/index.js";
-import * as knexConfig from "../knexfile.js";
-import models from "./models/index.js";
-import FormStrategy from "./lib/passportStrategies/FormStrategy.js";
+import * as knexConfig from '../knexfile.js';
+
+import getHelpers from './helpers/index.js';
+import FormStrategy from './lib/passportStrategies/FormStrategy.js';
+import en from './locales/en.js';
+import ru from './locales/ru.js';
+import models from './models/index.js';
+import addRoutes from './routes/index.js';
 
 const __dirname = fileURLToPath(path.dirname(import.meta.url));
 
-const mode = process.env.NODE_ENV || "development";
+const mode = process.env.NODE_ENV || 'development';
 // const isDevelopment = mode === 'development';
 
 const setUpViews = (app) => {
@@ -41,26 +41,26 @@ const setUpViews = (app) => {
       ...helpers,
       assetPath: (filename) => `/assets/${filename}`,
     },
-    templates: path.join(__dirname, "..", "server", "views"),
+    templates: path.join(__dirname, '..', 'server', 'views'),
   });
 
-  app.decorateReply("render", function render(viewPath, locals) {
+  app.decorateReply('render', function render(viewPath, locals) {
     this.view(viewPath, { ...locals, reply: this });
   });
 };
 
 const setUpStaticAssets = (app) => {
-  const pathPublic = path.join(__dirname, "..", "dist");
+  const pathPublic = path.join(__dirname, '..', 'dist');
   app.register(fastifyStatic, {
     root: pathPublic,
-    prefix: "/assets/",
+    prefix: '/assets/',
   });
 };
 
 const setupLocalization = async () => {
   await i18next.init({
-    lng: "ru",
-    fallbackLng: "en",
+    lng: 'ru',
+    fallbackLng: 'en',
     // debug: isDevelopment,
     resources: {
       ru,
@@ -70,7 +70,7 @@ const setupLocalization = async () => {
 };
 
 const addHooks = (app) => {
-  app.addHook("preHandler", async (req, reply) => {
+  app.addHook('preHandler', async (req, reply) => {
     reply.locals = {
       isAuthenticated: () => req.isAuthenticated(),
     };
@@ -85,26 +85,28 @@ const registerPlugins = async (app) => {
   await app.register(fastifySecureSession, {
     secret: process.env.SESSION_KEY,
     cookie: {
-      path: "/",
+      path: '/',
     },
   });
 
-  fastifyPassport.registerUserDeserializer((user) => app.objection.models.user.query().findById(user.id));
+  fastifyPassport.registerUserDeserializer((user) => app
+    .objection.models.user.query().findById(user.id));
   fastifyPassport.registerUserSerializer((user) => Promise.resolve(user));
-  fastifyPassport.use(new FormStrategy("form", app));
+  fastifyPassport.use(new FormStrategy('form', app));
   await app.register(fastifyPassport.initialize());
   await app.register(fastifyPassport.secureSession());
-  await app.decorate("fp", fastifyPassport);
-  await app.decorate("authenticate", (...args) =>
-    fastifyPassport.authenticate("form", {
-      failureRedirect: app.reverse("root"),
-      failureFlash: i18next.t("flash.authError"),
-    })(...args),
-  );
-  await app.decorate("checkUserAuthorization", (req, reply, done) => {
+  await app.decorate('fp', fastifyPassport);
+  await app.decorate('authenticate', (...args) => fastifyPassport
+    .authenticate('form', {
+      failureRedirect: app.reverse('root'),
+      failureFlash: i18next.t('flash.authError'),
+    })(...args));
+
+  await app.decorate('checkUserAuthorization', (req, reply, done) => {
     if (req.user.id !== Number(req.params.id)) {
-      req.flash("error", i18next.t("flash.users.edit.error.wrong_auth"));
-      reply.redirect(app.reverse("users"));
+      req.flash('error', i18next.t('flash.users.edit.error.wrong_auth'));
+      reply.redirect(app.reverse('users'));
+
       return reply;
     }
     return done();
@@ -112,6 +114,7 @@ const registerPlugins = async (app) => {
 
   await app.register(fastifyMethodOverride);
   await app.register(fastifyObjectionjs, {
+  /* eslint-disable-next-line import/namespace */
     knexConfig: knexConfig[mode],
     models,
   });
@@ -120,8 +123,8 @@ const registerPlugins = async (app) => {
 export const options = {
   exposeHeadRoutes: false,
 };
-
-export default async (app, _options) => {
+/* eslint-disable-next-line no-unused-vars */
+export default async (app, opt) => {
   await registerPlugins(app);
 
   await setupLocalization();

@@ -1,4 +1,4 @@
-import Label from "../models/Label.cjs";
+import Label from '../models/Label.cjs';
 
 class LabelService {
   constructor() {
@@ -26,9 +26,9 @@ class LabelService {
     await label.$query().delete();
   };
 
-  getlabelWithTasks = async (labelId) => this.labelModel.query().findById(labelId).withGraphFetched("tasks");
+  getlabelWithTasks = async (labelId) => this.labelModel.query().findById(labelId).withGraphFetched('tasks');
 
-  getLabelsbyIds = async (labelIds) => this.labelModel.query().whereIn("id", labelIds);
+  getLabelsbyIds = async (labelIds) => this.labelModel.query().whereIn('id', labelIds);
 }
 
 export default LabelService;
